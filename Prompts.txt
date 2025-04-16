@@ -1,0 +1,47 @@
+Project Setup Prompts
+
+1. "I need to create a web application for bidirectional data transfer between ClickHouse database and flat files. What's the best tech stack for this considering I need both backend and frontend components?"
+
+2. "Can you help me create the initial project structure for a Go/React application that will handle data transfer between ClickHouse and flat files?"
+
+3. "How should I organize the directory structure for a web app with Go backend and React frontend that handles database to file transfers?"
+
+Backend Development Prompts
+
+4. "What's the best way to connect to ClickHouse from Go using JWT authentication? I need to fetch schema information and query data."
+
+5. "Can you provide me with Go code to establish a connection to ClickHouse using JWT token authentication?"
+
+6. "How do I read schema information from a ClickHouse database using Go? I need to get table names and column definitions."
+
+7. "How can I efficiently handle large data transfers from ClickHouse to files in Go? Should I use streaming or batching?"
+
+Documentation Prompts
+
+8. "Help me write a comprehensive README.md for my ClickHouse and Flat File data ingestion tool that explains setup and usage."
+
+9. "What information should I include in my documentation about JWT authentication with ClickHouse?"
+
+Docker and Deployment Prompts
+
+10. "How do I set up a Docker container for local ClickHouse testing with example datasets like uk_price_paid?"
+
+Frontend Development Prompts
+
+11. "How do I create a HTML form for ClickHouse connection details including host, port, database, username, and JWT token?"
+
+12. "Can you create a HTML component for selecting between ClickHouse and Flat File as source and target?"
+
+13. "How do I implement a file upload component in HTML for flat file selection and preview?"
+
+14. "Design a HTML component that shows a list of database tables and allows users to select one for data transfer."
+
+15. "How can I create a HTML/CSS UI that displays table columns as selectable checkboxes for data transfer?"
+
+16. "What's the best way to show a progress indicator during data transfer operations in HTML?"
+
+17. "Create a HTML component that shows the results of a data transfer operation, including record count."
+
+18. "How do I connect my HTML frontend with my Go backend for the data transfer application?"
+
+19. "What's the best state management approach for a HTML application that needs to track connection status, selected tables, columns, and transfer progress?"
