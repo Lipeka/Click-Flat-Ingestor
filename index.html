@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Ingestion Tool</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --gray-color: #95a5a6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            text-align: center;
+            font-size: 2.2rem;
+        }
+
+        .app-description {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--gray-color);
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--dark-color);
+            border-bottom: 2px solid var(--light-color);
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background-color 0.3s;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+        }
+
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+        }
+
+        .btn-warning:hover {
+            background-color: #d35400;
+        }
+
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .status-area {
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .status-area.success {
+            border-left-color: var(--success-color);
+            background-color: #e8f5e9;
+        }
+
+        .status-area.error {
+            border-left-color: var(--danger-color);
+            background-color: #ffebee;
+        }
+
+        .status-area.warning {
+            border-left-color: var(--warning-color);
+            background-color: #fff8e1;
+        }
+
+        .result-area {
+            padding: 15px;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+            margin-top: 20px;
+        }
+
+        .result-area h3 {
+            margin-bottom: 10px;
+            color: var(--dark-color);
+        }
+
+        .columns-container {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .column-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .column-item input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        .progress-container {
+            margin-top: 20px;
+        }
+
+        .progress-bar {
+            height: 20px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress {
+            height: 100%;
+            background-color: var(--primary-color);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .progress-text {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--gray-color);
+        }
+
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+
+        .preview-table th, .preview-table td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        .preview-table th {
+            background-color: var(--light-color);
+            font-weight: 600;
+        }
+
+        .preview-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .join-condition {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .join-condition select, .join-condition input {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .add-join-btn {
+            margin-bottom: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            border-bottom-color: var(--primary-color);
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .join-condition {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .join-condition select, .join-condition input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Data Ingestion Tool</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="app-description">
+            <p>Transfer data between ClickHouse databases and flat files (CSV) with ease.</p>
+        </div>
+
+        <div class="card">
+            <h2 class="card-title">Data Source Configuration</h2>
+            
+            <div class="form-group">
+                <label for="sourceType">Source Type</label>
+                <select id="sourceType" class="form-control">
+                    <option value="">Select source type</option>
+                    <option value="clickhouse">ClickHouse</option>
+                    <option value="flatfile">Flat File (CSV)</option>
+                </select>
+            </div>
+
+            <!-- ClickHouse Source Form -->
+            <div id="clickhouseSourceForm" class="hidden">
+                <div class="form-group">
+                    <label for="chHost">Host</label>
+                    <input type="text" id="chHost" class="form-control" placeholder="e.g., localhost or 127.0.0.1">
+                </div>
+
+                <div class="form-group">
+                    <label for="chPort">Port</label>
+                    <input type="number" id="chPort" class="form-control" placeholder="9000" value="9000">
+                </div>
+
+                <div class="form-group">
+                    <label for="chDatabase">Database</label>
+                    <input type="text" id="chDatabase" class="form-control" placeholder="Database name">
+                </div>
+
+                <div class="form-group">
+                    <label for="chUsername">Username</label>
+                    <input type="text" id="chUsername" class="form-control" placeholder="Username">
+                </div>
+
+                <div class="form-group">
+                    <label for="chJwtToken">JWT Token</label>
+                    <input type="password" id="chJwtToken" class="form-control" placeholder="JWT Token">
+                </div>
+
+                <button id="connectClickHouseBtn" class="btn">Connect to ClickHouse</button>
+            </div>
+
+            <!-- Flat File Source Form -->
+            <div id="flatFileSourceForm" class="hidden">
+                <div class="form-group">
+                    <label for="csvFile">CSV File</label>
+                    <input type="file" id="csvFile" class="form-control" accept=".csv">
+                </div>
+
+                <div class="form-group">
+                    <label for="delimiter">Delimiter</label>
+                    <input type="text" id="delimiter" class="form-control" placeholder="," value="," maxlength="1">
+                </div>
+
+                <button id="loadCsvBtn" class="btn">Load CSV</button>
+            </div>
+        </div>
+
+        <div id="sourceStatus" class="status-area hidden"></div>
+
+        <div id="tablesContainer" class="card hidden">
+            <h2 class="card-title">Available Tables</h2>
+            <div id="tablesList" class="form-group"></div>
+            <button id="loadColumnsBtn" class="btn hidden">Load Columns</button>
+        </div>
+
+        <div id="columnsContainer" class="card hidden">
+            <h2 class="card-title">Select Columns</h2>
+            <div id="columnsList" class="columns-container"></div>
+            <button id="previewDataBtn" class="btn btn-warning">Preview Data (First 100 rows)</button>
+        </div>
+
+        <div id="previewContainer" class="card hidden">
+            <h2 class="card-title">Data Preview</h2>
+            <div id="previewData"></div>
+        </div>
+
+        <div class="card">
+            <h2 class="card-title">Data Ingestion Options</h2>
+            
+            <div class="tabs">
+                <div class="tab active" data-tab="simple">Simple Transfer</div>
+                <div class="tab" data-tab="join">Multi-Table Join (ClickHouse only)</div>
+            </div>
+            
+            <div id="simpleTab" class="tab-content active">
+                <div class="form-group">
+                    <label for="targetDirection">Transfer Direction</label>
+                    <select id="targetDirection" class="form-control">
+                        <option value="">Select transfer direction</option>
+                        <option value="clickhouse_to_flatfile">ClickHouse → Flat File</option>
+                        <option value="flatfile_to_clickhouse">Flat File → ClickHouse</option>
+                    </select>
+                </div>
+
+                <div id="flatFileTargetOptions" class="hidden">
+                    <div class="form-group">
+                        <label for="outputFilename">Output Filename</label>
+                        <input type="text" id="outputFilename" class="form-control" placeholder="output.csv">
+                    </div>
+                </div>
+
+                <div id="clickhouseTargetOptions" class="hidden">
+                    <div class="form-group">
+                        <label for="targetTable">Target Table Name</label>
+                        <input type="text" id="targetTable" class="form-control" placeholder="Target table name">
+                    </div>
+                </div>
+            </div>
+            
+            <div id="joinTab" class="tab-content">
+                <div class="form-group">
+                    <label>Join Conditions</label>
+                    <div id="joinConditions">
+                        <div class="join-condition">
+                            <select class="join-type form-control">
+                                <option value="INNER">INNER JOIN</option>
+                                <option value="LEFT">LEFT JOIN</option>
+                                <option value="RIGHT">RIGHT JOIN</option>
+                            </select>
+                            <input type="text" class="left-table form-control" placeholder="Left table">
+                            <input type="text" class="left-column form-control" placeholder="Left column">
+                            <input type="text" class="right-table form-control" placeholder="Right table">
+                            <input type="text" class="right-column form-control" placeholder="Right column">
+                        </div>
+                    </div>
+                    <button id="addJoinConditionBtn" class="btn add-join-btn">Add Join Condition</button>
+                    
+                    <div class="form-group">
+                        <label for="outputTable">Output Table Name (optional)</label>
+                        <input type="text" id="outputTable" class="form-control" placeholder="Leave empty for direct output">
+                    </div>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button id="startIngestionBtn" class="btn btn-success">Start Ingestion</button>
+                <button id="clearSelectionBtn" class="btn btn-danger">Clear Selection</button>
+            </div>
+        </div>
+
+        <div id="progressContainer" class="card hidden">
+            <h2 class="card-title">Ingestion Progress</h2>
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress" id="progressBar"></div>
+                </div>
+                <div class="progress-text" id="progressText">0%</div>
+            </div>
+        </div>
+
+        <div id="resultContainer" class="result-area hidden">
+            <h3>Ingestion Results</h3>
+            <div id="resultContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentSourceType = '';
+        let selectedTable = '';
+        let selectedColumns = [];
+        let tables = [];
+        let columns = [];
+        let previewData = [];
+        let jwtToken = '';
+
+        // DOM elements
+        const sourceTypeSelect = document.getElementById('sourceType');
+        const clickhouseSourceForm = document.getElementById('clickhouseSourceForm');
+        const flatFileSourceForm = document.getElementById('flatFileSourceForm');
+        const sourceStatus = document.getElementById('sourceStatus');
+        const tablesContainer = document.getElementById('tablesContainer');
+        const tablesList = document.getElementById('tablesList');
+        const loadColumnsBtn = document.getElementById('loadColumnsBtn');
+        const columnsContainer = document.getElementById('columnsContainer');
+        const columnsList = document.getElementById('columnsList');
+        const previewContainer = document.getElementById('previewContainer');
+        const previewDataBtn = document.getElementById('previewDataBtn');
+        const previewDataDiv = document.getElementById('previewData');
+        const targetDirectionSelect = document.getElementById('targetDirection');
+        const flatFileTargetOptions = document.getElementById('flatFileTargetOptions');
+        const clickhouseTargetOptions = document.getElementById('clickhouseTargetOptions');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const resultContainer = document.getElementById('resultContainer');
+        const resultContent = document.getElementById('resultContent');
+        const startIngestionBtn = document.getElementById('startIngestionBtn');
+        const clearSelectionBtn = document.getElementById('clearSelectionBtn');
+        const connectClickHouseBtn = document.getElementById('connectClickHouseBtn');
+        const loadCsvBtn = document.getElementById('loadCsvBtn');
+        const joinConditionsDiv = document.getElementById('joinConditions');
+        const addJoinConditionBtn = document.getElementById('addJoinConditionBtn');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        // Event Listeners
+        sourceTypeSelect.addEventListener('change', handleSourceTypeChange);
+        connectClickHouseBtn.addEventListener('click', connectToClickHouse);
+        loadCsvBtn.addEventListener('click', loadCsvFile);
+        loadColumnsBtn.addEventListener('click', loadColumns);
+        previewDataBtn.addEventListener('click', showPreview);
+        targetDirectionSelect.addEventListener('change', handleTargetDirectionChange);
+        startIngestionBtn.addEventListener('click', startIngestion);
+        clearSelectionBtn.addEventListener('click', clearSelection);
+        addJoinConditionBtn.addEventListener('click', addJoinCondition);
+
+        // Tab switching
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                
+                tab.classList.add('active');
+                const tabId = tab.getAttribute('data-tab') + 'Tab';
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // Functions
+        function handleSourceTypeChange() {
+            currentSourceType = sourceTypeSelect.value;
+            clickhouseSourceForm.classList.add('hidden');
+            flatFileSourceForm.classList.add('hidden');
+            sourceStatus.classList.add('hidden');
+            tablesContainer.classList.add('hidden');
+            columnsContainer.classList.add('hidden');
+            previewContainer.classList.add('hidden');
+
+            if (currentSourceType === 'clickhouse') {
+                clickhouseSourceForm.classList.remove('hidden');
+            } else if (currentSourceType === 'flatfile') {
+                flatFileSourceForm.classList.remove('hidden');
+            }
+        }
+
+        async function connectToClickHouse() {
+            const host = document.getElementById('chHost').value;
+            const port = document.getElementById('chPort').value;
+            const database = document.getElementById('chDatabase').value;
+            const username = document.getElementById('chUsername').value;
+            jwtToken = document.getElementById('chJwtToken').value;
+
+            if (!host || !port || !database || !username || !jwtToken) {
+                showStatus('Please fill all required fields', 'error');
+                return;
+            }
+
+            showStatus('Connecting to ClickHouse...', 'info');
+
+            try {
+                const response = await fetch('/tables', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${jwtToken}`
+                    },
+                    body: JSON.stringify({
+                        source_type: 'clickhouse',
+                        host: host,
+                        port: parseInt(port),
+                        database: database,
+                        username: username,
+                        jwt_token: jwtToken
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to connect to ClickHouse');
+                }
+
+                tables = await response.json();
+                displayTables();
+                showStatus('Successfully connected to ClickHouse', 'success');
+                tablesContainer.classList.remove('hidden');
+            } catch (error) {
+                showStatus(error.message, 'error');
+                console.error('Error connecting to ClickHouse:', error);
+            }
+        }
+
+        function displayTables() {
+            tablesList.innerHTML = '';
+            
+            if (tables.length === 0) {
+                tablesList.innerHTML = '<p>No tables found in the database.</p>';
+                return;
+            }
+
+            const select = document.createElement('select');
+            select.id = 'tableSelect';
+            select.className = 'form-control';
+            select.innerHTML = '<option value="">Select a table</option>';
+            
+            tables.forEach(table => {
+                const option = document.createElement('option');
+                option.value = table;
+                option.textContent = table;
+                select.appendChild(option);
+            });
+            
+            select.addEventListener('change', function() {
+                selectedTable = this.value;
+                loadColumnsBtn.classList.toggle('hidden', !selectedTable);
+            });
+            
+            tablesList.appendChild(select);
+        }
+
+        async function loadColumns() {
+            if (!selectedTable) {
+                showStatus('Please select a table first', 'error');
+                return;
+            }
+
+            showStatus(`Loading columns for table ${selectedTable}...`, 'info');
+
+            try {
+                const response = await fetch('/schema', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${jwtToken}`
+                    },
+                    body: JSON.stringify({
+                        source_type: 'clickhouse',
+                        host: document.getElementById('chHost').value,
+                        port: parseInt(document.getElementById('chPort').value),
+                        database: document.getElementById('chDatabase').value,
+                        username: document.getElementById('chUsername').value,
+                        jwt_token: jwtToken,
+                        selected_tables: [selectedTable]
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to load columns');
+                }
+
+                columns = await response.json();
+                displayColumns();
+                showStatus(`Successfully loaded ${columns.length} columns`, 'success');
+                columnsContainer.classList.remove('hidden');
+            } catch (error) {
+                showStatus(error.message, 'error');
+                console.error('Error loading columns:', error);
+            }
+        }
+
+        function displayColumns() {
+            columnsList.innerHTML = '';
+            selectedColumns = [];
+            
+            if (columns.length === 0) {
+                columnsList.innerHTML = '<p>No columns found in this table.</p>';
+                return;
+            }
+
+            columns.forEach(column => {
+                const div = document.createElement('div');
+                div.className = 'column-item';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `col-${column}`;
+                checkbox.value = column;
+                checkbox.checked = true;
+                
+                checkbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        selectedColumns.push(this.value);
+                    } else {
+                        selectedColumns = selectedColumns.filter(col => col !== this.value);
+                    }
+                });
+                
+                const label = document.createElement('label');
+                label.htmlFor = `col-${column}`;
+                label.textContent = column;
+                
+                div.appendChild(checkbox);
+                div.appendChild(label);
+                columnsList.appendChild(div);
+                
+                // Add to selected columns by default
+                selectedColumns.push(column);
+            });
+        }
+
+        async function loadCsvFile() {
+            const fileInput = document.getElementById('csvFile');
+            const delimiter = document.getElementById('delimiter').value || ',';
+            
+            if (!fileInput.files || fileInput.files.length === 0) {
+                showStatus('Please select a CSV file first', 'error');
+                return;
+            }
+
+            showStatus('Loading CSV file...', 'info');
+
+            const formData = new FormData();
+            formData.append('csv_file', fileInput.files[0]);
+            formData.append('delimiter', delimiter);
+
+            try {
+                // First upload the file
+                const uploadResponse = await fetch('/ingest', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!uploadResponse.ok) {
+                    const error = await uploadResponse.json();
+                    throw new Error(error.error || 'Failed to upload CSV file');
+                }
+
+                // Then get the columns (headers)
+                const filePath = './uploads/uploaded_file.csv';
+                const previewResponse = await fetch(`/preview?source=flatfile&file=${encodeURIComponent(filePath)}&limit=1`);
+                
+                if (!previewResponse.ok) {
+                    const error = await previewResponse.json();
+                    throw new Error(error.error || 'Failed to read CSV file');
+                }
+
+                const data = await previewResponse.json();
+                if (data.length === 0) {
+                    throw new Error('CSV file is empty or could not be read');
+                }
+
+                columns = data[0]; // First row is headers
+                selectedTable = 'csv_data'; // Default table name for CSV
+                displayColumns();
+                showStatus(`Successfully loaded CSV with ${columns.length} columns`, 'success');
+                tablesContainer.classList.add('hidden'); // No tables for CSV
+                columnsContainer.classList.remove('hidden');
+            } catch (error) {
+                showStatus(error.message, 'error');
+                console.error('Error loading CSV:', error);
+            }
+        }
+
+        async function showPreview() {
+            if (selectedColumns.length === 0) {
+                showStatus('Please select at least one column', 'error');
+                return;
+            }
+
+            showStatus('Loading preview data...', 'info');
+
+            try {
+                let data;
+                if (currentSourceType === 'clickhouse') {
+                    const response = await fetch('/preview', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${jwtToken}`
+                        },
+                        body: JSON.stringify({
+                            source_type: 'clickhouse',
+                            host: document.getElementById('chHost').value,
+                            port: parseInt(document.getElementById('chPort').value),
+                            database: document.getElementById('chDatabase').value,
+                            username: document.getElementById('chUsername').value,
+                            jwt_token: jwtToken,
+                            selected_tables: [selectedTable],
+                            selected_columns: { [selectedTable]: selectedColumns }
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.error || 'Failed to load preview data');
+                    }
+
+                    data = await response.json();
+                } else {
+                    const filePath = './uploads/uploaded_file.csv';
+                    const delimiter = document.getElementById('delimiter').value || ',';
+                    const response = await fetch(`/preview?source=flatfile&file=${encodeURIComponent(filePath)}&limit=100&delimiter=${encodeURIComponent(delimiter)}`);
+                    
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.error || 'Failed to load preview data');
+                    }
+
+                    data = await response.json();
+                }
+
+                previewData = data;
+                displayPreview();
+                showStatus('Preview data loaded successfully', 'success');
+                previewContainer.classList.remove('hidden');
+            } catch (error) {
+                showStatus(error.message, 'error');
+                console.error('Error loading preview:', error);
+            }
+        }
+
+        function displayPreview() {
+            previewDataDiv.innerHTML = '';
+            
+            if (previewData.length === 0) {
+                previewDataDiv.innerHTML = '<p>No data available for preview.</p>';
+                return;
+            }
+
+            const table = document.createElement('table');
+            table.className = 'preview-table';
+            
+            // Create header row
+            const thead = document.createElement('thead');
+            const headerRow = document.createElement('tr');
+            
+            // For ClickHouse, we have an array of objects
+            // For CSV, we have an array of arrays (first row is headers)
+            if (currentSourceType === 'clickhouse') {
+                // Use selected columns as headers
+                selectedColumns.forEach(col => {
+                    const th = document.createElement('th');
+                    th.textContent = col;
+                    headerRow.appendChild(th);
+                });
+            } else {
+                // First row is headers
+                previewData[0].forEach(col => {
+                    const th = document.createElement('th');
+                    th.textContent = col;
+                    headerRow.appendChild(th);
+                });
+            }
+            
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+            
+            // Create body
+            const tbody = document.createElement('tbody');
+            
+            // For ClickHouse, we have an array of objects
+            // For CSV, we skip the first row (headers)
+            const startRow = currentSourceType === 'clickhouse' ? 0 : 1;
+            const endRow = Math.min(startRow + 100, previewData.length);
+            
+            for (let i = startRow; i < endRow; i++) {
+                const row = document.createElement('tr');
+                
+                if (currentSourceType === 'clickhouse') {
+                    selectedColumns.forEach(col => {
+                        const td = document.createElement('td');
+                        td.textContent = previewData[i][col] || '';
+                        row.appendChild(td);
+                    });
+                } else {
+                    previewData[i].forEach(val => {
+                        const td = document.createElement('td');
+                        td.textContent = val || '';
+                        row.appendChild(td);
+                    });
+                }
+                
+                tbody.appendChild(row);
+            }
+            
+            table.appendChild(tbody);
+            previewDataDiv.appendChild(table);
+        }
+
+        function handleTargetDirectionChange() {
+            const direction = targetDirectionSelect.value;
+            flatFileTargetOptions.classList.add('hidden');
+            clickhouseTargetOptions.classList.add('hidden');
+            
+            if (direction === 'clickhouse_to_flatfile') {
+                flatFileTargetOptions.classList.remove('hidden');
+            } else if (direction === 'flatfile_to_clickhouse') {
+                clickhouseTargetOptions.classList.remove('hidden');
+            }
+        }
+
+        async function startIngestion() {
+            const direction = targetDirectionSelect.value;
+            
+            if (!direction) {
+                showStatus('Please select a transfer direction', 'error');
+                return;
+            }
+
+            if (selectedColumns.length === 0) {
+                showStatus('Please select at least one column', 'error');
+                return;
+            }
+
+            // Validate target options
+            if (direction === 'clickhouse_to_flatfile') {
+                const outputFilename = document.getElementById('outputFilename').value;
+                if (!outputFilename) {
+                    showStatus('Please specify an output filename', 'error');
+                    return;
+                }
+            } else if (direction === 'flatfile_to_clickhouse') {
+                const targetTable = document.getElementById('targetTable').value;
+                if (!targetTable) {
+                    showStatus('Please specify a target table name', 'error');
+                    return;
+                }
+            }
+
+            showStatus('Starting data ingestion...', 'info');
+            progressContainer.classList.remove('hidden');
+            updateProgress(0);
+
+            try {
+                const requestData = {
+                    source_type: currentSourceType,
+                    target_direction: direction,
+                    selected_tables: [selectedTable],
+                    selected_columns: { [selectedTable]: selectedColumns },
+                    jwt_token: jwtToken
+                };
+
+                // Add source-specific parameters
+                if (currentSourceType === 'clickhouse') {
+                    requestData.host = document.getElementById('chHost').value;
+                    requestData.port = parseInt(document.getElementById('chPort').value);
+                    requestData.database = document.getElementById('chDatabase').value;
+                    requestData.username = document.getElementById('chUsername').value;
+                } else {
+                    requestData.flat_file_name = './uploads/uploaded_file.csv';
+                    requestData.delimiter = document.getElementById('delimiter').value || ',';
+                }
+
+                // Add target-specific parameters
+                if (direction === 'clickhouse_to_flatfile') {
+                    requestData.flat_file_name = document.getElementById('outputFilename').value;
+                } else {
+                    requestData.database = document.getElementById('chDatabase').value;
+                    requestData.output_table = document.getElementById('targetTable').value;
+                }
+
+                // For join operations
+                const activeTab = document.querySelector('.tab.active');
+                if (activeTab && activeTab.getAttribute('data-tab') === 'join') {
+                    const joinConditions = [];
+                    const joinElements = document.querySelectorAll('.join-condition');
+                    
+                    joinElements.forEach(el => {
+                        const joinType = el.querySelector('.join-type').value;
+                        const leftTable = el.querySelector('.left-table').value;
+                        const leftColumn = el.querySelector('.left-column').value;
+                        const rightTable = el.querySelector('.right-table').value;
+                        const rightColumn = el.querySelector('.right-column').value;
+                        
+                        if (leftTable && leftColumn && rightTable && rightColumn) {
+                            joinConditions.push({
+                                left_table: leftTable,
+                                left_column: leftColumn,
+                                right_table: rightTable,
+                                right_column: rightColumn,
+                                join_type: joinType
+                            });
+                        }
+                    });
+                    
+                    if (joinConditions.length > 0) {
+                        requestData.join_conditions = joinConditions;
+                        requestData.output_table = document.getElementById('outputTable').value;
+                    }
+                }
+
+                const response = await fetch('/ingest', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${jwtToken}`
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Ingestion failed');
+                }
+
+                const result = await response.json();
+                updateProgress(100);
+                showResult(result);
+                showStatus('Data ingestion completed successfully', 'success');
+            } catch (error) {
+                showStatus(error.message, 'error');
+                console.error('Error during ingestion:', error);
+            }
+        }
+
+        function updateProgress(percent) {
+            progressBar.style.width = `${percent}%`;
+            progressText.textContent = `${percent}%`;
+        }
+
+        function showResult(result) {
+            resultContainer.classList.remove('hidden');
+            resultContent.innerHTML = `
+                <p><strong>Status:</strong> ${result.message || 'Completed'}</p>
+                <p><strong>Records Processed:</strong> ${result.ingested_records || 'N/A'}</p>
+            `;
+        }
+
+        function showStatus(message, type) {
+            sourceStatus.classList.remove('hidden', 'success', 'error', 'warning');
+            sourceStatus.textContent = message;
+            sourceStatus.classList.add(type);
+        }
+
+        function clearSelection() {
+            // Reset forms
+            sourceTypeSelect.value = '';
+            clickhouseSourceForm.classList.add('hidden');
+            flatFileSourceForm.classList.add('hidden');
+            sourceStatus.classList.add('hidden');
+            tablesContainer.classList.add('hidden');
+            columnsContainer.classList.add('hidden');
+            previewContainer.classList.add('hidden');
+            progressContainer.classList.add('hidden');
+            resultContainer.classList.add('hidden');
+            
+            // Reset form fields
+            document.getElementById('chHost').value = '';
+            document.getElementById('chPort').value = '9000';
+            document.getElementById('chDatabase').value = '';
+            document.getElementById('chUsername').value = '';
+            document.getElementById('chJwtToken').value = '';
+            document.getElementById('csvFile').value = '';
+            document.getElementById('delimiter').value = ',';
+            
+            // Reset selections
+            currentSourceType = '';
+            selectedTable = '';
+            selectedColumns = [];
+            tables = [];
+            columns = [];
+            previewData = [];
+        }
+
+        function addJoinCondition() {
+            const newCondition = document.createElement('div');
+            newCondition.className = 'join-condition';
+            newCondition.innerHTML = `
+                <select class="join-type form-control">
+                    <option value="INNER">INNER JOIN</option>
+                    <option value="LEFT">LEFT JOIN</option>
+                    <option value="RIGHT">RIGHT JOIN</option>
+                </select>
+                <input type="text" class="left-table form-control" placeholder="Left table">
+                <input type="text" class="left-column form-control" placeholder="Left column">
+                <input type="text" class="right-table form-control" placeholder="Right table">
+                <input type="text" class="right-column form-control" placeholder="Right column">
+            `;
+            joinConditionsDiv.appendChild(newCondition);
+        }
+    </script>
+</body>
+</html>
